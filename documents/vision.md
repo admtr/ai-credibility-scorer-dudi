@@ -1,4 +1,4 @@
-## dudi
+## DuDi
 
 Zanim firma zapłaci nowemu dostawcy, księgowa lub pracownik działu zakupów powinni sprawdzić, z kim mają do czynienia. Wymaga to ręcznego przeszukania kilku rejestrów: KRS, Białej listy VAT, CRBR i list sankcyjnych UE, więc weryfikację często się pomija. Chcemy stworzyć agenta AI, który zrobi to za nich i przygotuje raport ryzyka z uzasadnieniem.
 
