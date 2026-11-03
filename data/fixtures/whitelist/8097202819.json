@@ -1,0 +1,31 @@
+{
+  "result": {
+    "subject": {
+      "name": "ZETA IMPORT SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+      "nip": "8097202819",
+      "statusVat": "Czynny",
+      "regon": "380667788",
+      "pesel": null,
+      "krs": "0009990006",
+      "residenceAddress": "PORTOWA 9, 81-001 GDYNIA",
+      "workingAddress": null,
+      "representatives": [],
+      "authorizedClerks": [],
+      "partners": [],
+      "registrationLegalDate": "2020-07-01",
+      "registrationDenialDate": null,
+      "registrationDenialBasis": null,
+      "restorationDate": null,
+      "restorationBasis": null,
+      "removalDate": null,
+      "removalBasis": null,
+      "exemptionSmeDate": null,
+      "accountNumbers": [
+        "42102028925379581752477936"
+      ],
+      "hasVirtualAccounts": false
+    },
+    "requestDateTime": "02-11-2026 10:00:00",
+    "requestId": "MOCK-0006"
+  }
+}

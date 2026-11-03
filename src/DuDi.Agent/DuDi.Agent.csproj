@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Agent: instrukcje systemowe, kontekst, narzędzia i konfiguracja IChatClient (Ollama lub API zgodne z OpenAI, np. PCSS). -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.11.0" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.11.0" />
+    <PackageReference Include="OllamaSharp" Version="5.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DuDi.Core\DuDi.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Prompts\system-prompt.md" LogicalName="DuDi.Agent.Prompts.system-prompt.md" />
+  </ItemGroup>
+
+</Project>

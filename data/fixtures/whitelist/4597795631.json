@@ -1,0 +1,29 @@
+{
+  "result": {
+    "subject": {
+      "name": "IOTA SERWIS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+      "nip": "4597795631",
+      "statusVat": "Niezarejestrowany",
+      "regon": "380889900",
+      "pesel": null,
+      "krs": "0009990008",
+      "residenceAddress": "SERWISOWA 4, 50-001 WROCŁAW",
+      "workingAddress": null,
+      "representatives": [],
+      "authorizedClerks": [],
+      "partners": [],
+      "registrationLegalDate": "2014-01-10",
+      "registrationDenialDate": null,
+      "registrationDenialBasis": null,
+      "restorationDate": null,
+      "restorationBasis": null,
+      "removalDate": "2026-02-10",
+      "removalBasis": "Art. 96 ust. 9 pkt 4 ustawy o VAT",
+      "exemptionSmeDate": null,
+      "accountNumbers": [],
+      "hasVirtualAccounts": false
+    },
+    "requestDateTime": "02-11-2026 10:00:00",
+    "requestId": "MOCK-0008"
+  }
+}

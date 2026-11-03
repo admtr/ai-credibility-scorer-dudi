@@ -1,0 +1,14 @@
+{
+  "nip": "9255757334",
+  "nazwaSpolki": "BETA TRANS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+  "dataZgloszenia": "2024-05-10",
+  "beneficjenci": [
+    {
+      "imie": "Jan",
+      "nazwisko": "Kowalski",
+      "obywatelstwo": "POLSKIE",
+      "krajZamieszkania": "POLSKA",
+      "rodzajUprawnien": "Udziałowiec – 100% udziałów"
+    }
+  ]
+}

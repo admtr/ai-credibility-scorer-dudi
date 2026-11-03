@@ -1,0 +1,31 @@
+{
+  "result": {
+    "subject": {
+      "name": "BETA TRANS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+      "nip": "9255757334",
+      "statusVat": "Czynny",
+      "regon": "380223344",
+      "pesel": null,
+      "krs": "0009990002",
+      "residenceAddress": "PRZYKŁADOWA 12, 90-001 ŁÓDŹ",
+      "workingAddress": null,
+      "representatives": [],
+      "authorizedClerks": [],
+      "partners": [],
+      "registrationLegalDate": "2017-09-01",
+      "registrationDenialDate": null,
+      "registrationDenialBasis": null,
+      "restorationDate": null,
+      "restorationBasis": null,
+      "removalDate": null,
+      "removalBasis": null,
+      "exemptionSmeDate": null,
+      "accountNumbers": [
+        "70105014453872590736196366"
+      ],
+      "hasVirtualAccounts": false
+    },
+    "requestDateTime": "02-11-2026 10:00:00",
+    "requestId": "MOCK-0002"
+  }
+}

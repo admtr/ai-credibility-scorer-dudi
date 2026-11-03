@@ -1,0 +1,5 @@
+fileGenerationDate;Entity_LogicalId;Entity_EU_ReferenceNumber;Entity_SubjectType;Entity_Regulation_Programme;Entity_Regulation_NumberTitle;NameAlias_LastName;NameAlias_FirstName;NameAlias_WholeName;Citizenship_CountryDescription
+2026-11-02;9999001;EU.99901.01;person;UKR;"2014/269 (OJ L78) [DANE TESTOWE]";ZMYŚLONOW;Arkadij;Arkadij Zmyślonow;RUSSIAN FEDERATION
+2026-11-02;9999001;EU.99901.01;person;UKR;"2014/269 (OJ L78) [DANE TESTOWE]";ZMYSLONOV;Arkadiy;Arkadiy Zmyslonov;RUSSIAN FEDERATION
+2026-11-02;9999002;EU.99902.02;enterprise;RUS;"2014/833 (OJ L229) [DANE TESTOWE]";;;"Fikcyjny Holding Testowy Ltd";
+2026-11-02;9999003;EU.99903.03;person;BLR;"765/2006 (OJ L134) [DANE TESTOWE]";PRZYKŁADOW;Iwan;Iwan Przykładow;BELARUS
