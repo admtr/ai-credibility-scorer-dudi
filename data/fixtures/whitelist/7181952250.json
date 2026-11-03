@@ -1,0 +1,31 @@
+{
+  "result": {
+    "subject": {
+      "name": "ETA USŁUGI SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+      "nip": "7181952250",
+      "statusVat": "Zwolniony",
+      "regon": "380778899",
+      "pesel": null,
+      "krs": "0009990007",
+      "residenceAddress": "NOWA 2, 60-001 POZNAŃ",
+      "workingAddress": null,
+      "representatives": [],
+      "authorizedClerks": [],
+      "partners": [],
+      "registrationLegalDate": "2026-08-10",
+      "registrationDenialDate": null,
+      "registrationDenialBasis": null,
+      "restorationDate": null,
+      "restorationBasis": null,
+      "removalDate": null,
+      "removalBasis": null,
+      "exemptionSmeDate": null,
+      "accountNumbers": [
+        "72109000046980854732981881"
+      ],
+      "hasVirtualAccounts": false
+    },
+    "requestDateTime": "02-11-2026 10:00:00",
+    "requestId": "MOCK-0007"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "result": {
+    "subject": {
+      "name": "GAMMA HANDEL SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+      "nip": "9101438731",
+      "statusVat": "Czynny",
+      "regon": "380334455",
+      "pesel": null,
+      "krs": "0009990003",
+      "residenceAddress": "FIKCYJNA 7, 30-001 KRAKÓW",
+      "workingAddress": null,
+      "representatives": [],
+      "authorizedClerks": [],
+      "partners": [],
+      "registrationLegalDate": "2018-02-15",
+      "registrationDenialDate": null,
+      "registrationDenialBasis": null,
+      "restorationDate": null,
+      "restorationBasis": null,
+      "removalDate": null,
+      "removalBasis": null,
+      "exemptionSmeDate": null,
+      "accountNumbers": [
+        "67102031476778048981374468"
+      ],
+      "hasVirtualAccounts": false
+    },
+    "requestDateTime": "02-11-2026 10:00:00",
+    "requestId": "MOCK-0003"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "result": {
+    "subject": {
+      "name": "ALFA BUDOWNICTWO SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+      "nip": "9488127353",
+      "statusVat": "Czynny",
+      "regon": "380112233",
+      "pesel": null,
+      "krs": "0009990001",
+      "residenceAddress": "TESTOWA 1, 00-001 WARSZAWA",
+      "workingAddress": null,
+      "representatives": [],
+      "authorizedClerks": [],
+      "partners": [],
+      "registrationLegalDate": "2015-04-20",
+      "registrationDenialDate": null,
+      "registrationDenialBasis": null,
+      "restorationDate": null,
+      "restorationBasis": null,
+      "removalDate": null,
+      "removalBasis": null,
+      "exemptionSmeDate": null,
+      "accountNumbers": [
+        "98109010140555894985714842",
+        "33114020040558532425670306"
+      ],
+      "hasVirtualAccounts": false
+    },
+    "requestDateTime": "02-11-2026 10:00:00",
+    "requestId": "MOCK-0001"
+  }
+}

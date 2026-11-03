@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Implementacje IRegistrySource. Teraz: symulowana baza (JSON/CSV w formacie prawdziwych API). Etap 3–4: klienci HTTP. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\DuDi.Core\DuDi.Core.csproj" />
+  </ItemGroup>
+
+</Project>

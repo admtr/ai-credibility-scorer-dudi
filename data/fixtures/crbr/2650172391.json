@@ -1,0 +1,21 @@
+{
+  "nip": "2650172391",
+  "nazwaSpolki": "DELTA LOGISTICS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ W UPADŁOŚCI",
+  "dataZgloszenia": "2024-05-10",
+  "beneficjenci": [
+    {
+      "imie": "Marek",
+      "nazwisko": "Nowicki",
+      "obywatelstwo": "POLSKIE",
+      "krajZamieszkania": "POLSKA",
+      "rodzajUprawnien": "Udziałowiec – 70% udziałów"
+    },
+    {
+      "imie": "Tomasz",
+      "nazwisko": "Wójcik",
+      "obywatelstwo": "POLSKIE",
+      "krajZamieszkania": "POLSKA",
+      "rodzajUprawnien": "Udziałowiec – 30% udziałów"
+    }
+  ]
+}

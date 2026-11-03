@@ -1,0 +1,21 @@
+{
+  "nip": "9488127353",
+  "nazwaSpolki": "ALFA BUDOWNICTWO SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+  "dataZgloszenia": "2024-05-10",
+  "beneficjenci": [
+    {
+      "imie": "Anna",
+      "nazwisko": "Wiśniewska",
+      "obywatelstwo": "POLSKIE",
+      "krajZamieszkania": "POLSKA",
+      "rodzajUprawnien": "Udziałowiec – 60% udziałów"
+    },
+    {
+      "imie": "Piotr",
+      "nazwisko": "Zieliński",
+      "obywatelstwo": "POLSKIE",
+      "krajZamieszkania": "POLSKA",
+      "rodzajUprawnien": "Udziałowiec – 40% udziałów"
+    }
+  ]
+}

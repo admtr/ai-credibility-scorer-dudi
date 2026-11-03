@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DuDi.Core/DuDi.Core.csproj" />
+    <Project Path="src/DuDi.Sources/DuDi.Sources.csproj" />
+    <Project Path="src/DuDi.Agent/DuDi.Agent.csproj" />
+    <Project Path="src/DuDi.Cli/DuDi.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DuDi.Tests/DuDi.Tests.csproj" />
+  </Folder>
+</Solution>

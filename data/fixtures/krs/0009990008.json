@@ -1,0 +1,97 @@
+{
+  "odpis": {
+    "rodzaj": "Aktualny",
+    "naglowekA": {
+      "rejestr": "RejP",
+      "numerKRS": "0009990008",
+      "dataCzasOdpisu": "02.11.2026 10:00:00",
+      "stanZDnia": "30.10.2026",
+      "dataRejestracjiWKRS": "03.01.2014",
+      "numerOstatniegoWpisu": 13,
+      "dataOstatniegoWpisu": "30.10.2026",
+      "sygnaturaAktSprawyDotyczacejOstatniegoWpisu": "MOCK.XX NS-REJ.KRS/1008/26/001",
+      "oznaczenieSaduDokonujacegoOstatniegoWpisu": "SĄD REJONOWY TESTOWY, WYDZIAŁ GOSPODARCZY KRAJOWEGO REJESTRU SĄDOWEGO",
+      "stanPozycji": 1
+    },
+    "dane": {
+      "dzial1": {
+        "danePodmiotu": {
+          "formaPrawna": "SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+          "identyfikatory": {
+            "regon": "38088990000000",
+            "nip": "4597795631"
+          },
+          "nazwa": "IOTA SERWIS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+          "czyProwadziDzialalnoscZInnymiPodmiotami": false,
+          "czyPosiadaStatusOPP": false
+        },
+        "siedzibaIAdres": {
+          "siedziba": {
+            "kraj": "POLSKA",
+            "miejscowosc": "WROCŁAW"
+          },
+          "adres": {
+            "ulica": "UL. SERWISOWA",
+            "nrDomu": "4",
+            "miejscowosc": "WROCŁAW",
+            "kodPocztowy": "50-001",
+            "poczta": "WROCŁAW",
+            "kraj": "POLSKA"
+          }
+        }
+      },
+      "dzial2": {
+        "reprezentacja": {
+          "nazwaOrganu": "ZARZĄD",
+          "sposobReprezentacji": "DO REPREZENTOWANIA SPÓŁKI UPRAWNIONY JEST KAŻDY CZŁONEK ZARZĄDU SAMODZIELNIE.",
+          "sklad": [
+            {
+              "nazwisko": {
+                "nazwiskoICzlon": "SZYMAŃSKI"
+              },
+              "imiona": {
+                "imie": "ROBERT"
+              },
+              "identyfikator": {
+                "pesel": "0**********"
+              },
+              "funkcjaWOrganie": "PREZES ZARZĄDU",
+              "czyZawieszona": false
+            }
+          ]
+        }
+      },
+      "dzial3": {
+        "przedmiotDzialalnosci": {
+          "przedmiotPrzewazajacejDzialalnosci": [
+            {
+              "opis": "DZIAŁALNOŚĆ TESTOWA",
+              "kodDzial": "70",
+              "kodKlasa": "22",
+              "kodPodklasa": "Z"
+            }
+          ]
+        },
+        "wzmiankiOZlozonychDokumentach": {
+          "wzmiankaOZlozeniuRocznegoSprawozdaniaFinansowego": [
+            {
+              "dataZlozenia": "20.06.2024",
+              "zaOkresOdDo": "OD 01.01.2023 DO 31.12.2023"
+            },
+            {
+              "dataZlozenia": "19.06.2025",
+              "zaOkresOdDo": "OD 01.01.2024 DO 31.12.2024"
+            },
+            {
+              "dataZlozenia": "18.06.2026",
+              "zaOkresOdDo": "OD 01.01.2025 DO 31.12.2025"
+            }
+          ]
+        }
+      },
+      "dzial4": {},
+      "dzial5": {},
+      "dzial6": {}
+    }
+  }
+}

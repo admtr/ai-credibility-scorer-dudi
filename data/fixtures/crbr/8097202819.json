@@ -1,0 +1,21 @@
+{
+  "nip": "8097202819",
+  "nazwaSpolki": "ZETA IMPORT SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ",
+  "dataZgloszenia": "2024-05-10",
+  "beneficjenci": [
+    {
+      "imie": "Arkadij",
+      "nazwisko": "Zmyślonow",
+      "obywatelstwo": "ROSYJSKIE",
+      "krajZamieszkania": "CYPR",
+      "rodzajUprawnien": "Udziałowiec – 75% udziałów"
+    },
+    {
+      "imie": "Ewa",
+      "nazwisko": "Kamińska",
+      "obywatelstwo": "POLSKIE",
+      "krajZamieszkania": "POLSKA",
+      "rodzajUprawnien": "Udziałowiec – 25% udziałów"
+    }
+  ]
+}

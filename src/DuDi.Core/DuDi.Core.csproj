@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Model domeny, interfejsy źródeł danych i reguły oceny ryzyka. Bez zależności od LLM ani HTTP. -->
+
+</Project>
