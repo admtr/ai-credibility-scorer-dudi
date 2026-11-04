@@ -47,4 +47,9 @@ Wypełnia zespół po uruchomieniu agenta (model, data, wersja promptu z `eval/p
 
 | ID | Model | Prompt | Narzędzie OK | Werdykt OK | Halucynacje (0–2) | Język (0–2) | Format (0–2) | Uwagi |
 |---|---|---|---|---|---|---|---|---|
-| T01 | qwen3:4b | v1 | | | | | | |
+| T01 | qwen3:4b | v1 | sprawdz_kontrahenta | NISKIE | 2 | 0 | 1 | Model odpowiada po angielsku, cały czas krąży wokół niepodanego rachunku bankowego, odpowiedź się pojawia ale pomiędzy jakimiś halucynacjami modelu|
+| T01 | deepseek-v3 | v1 | sprawdz_kontrahenta | NISKIE | 0 | 2 | 2 | Model odpowiada zwięźle, po polsku bez błędów
+| T02 | deepseek-v3 | v1 | sprawdz_kontrahenta(nip, rachunek) | NISKIE | 0 | 2 | 2 | Model odpowiada zwięźle, po polsku bez błędów
+| T03 | deepseek-v3 | v1 |  | NISKIE | 0 | 2 | 2 | Model odpowiada zwięźle, po polsku bez błędów
+| P01 | deepseek-v3 | v1 |  | - | 0 | 2 | 2 | Model nie podał żadnych fałszywych danych, podał wiadomość, że kontrahenta nie ma w źródłach
+| P08 | deepseek-v3 | v1 |  | - | 0 | 2 | 2 | Model prosi o numer NIP, nie robi nic z pamięci
