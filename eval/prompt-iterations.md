@@ -12,7 +12,12 @@ Na bazie wersji roboczej z planu (sekcja 3.6), z dopiskami pod tool calling:
 - zalecenia model bierze z pól „Zalecenie”, nie wymyśla własnych;
 - osobna reguła dla dopytań: bez powtarzania całego raportu.
 
-**Wyniki:** _do uzupełnienia po pierwszym przebiegu scenariuszy z `eval/cases.md`._
+**Wyniki (2026-11-04):**
+
+- `qwen3:4b`, T01: model przechodził na angielski, krążył wokół niepodanego rachunku i dodawał zmyślone treści. Problem wynikał z jakości modelu, nie z treści promptu, więc zamiast przepisywać prompt zmieniliśmy model (`documents/model-selection.md`).
+- `DeepSeek-V3.1`, T01–T03, P01, P08: odpowiedzi po polsku, w wymaganym formacie, bez halucynacji. Przy nieznanym NIP-ie (P01) i pytaniu o prawdziwą firmę bez NIP-u (P08) model nie podawał niczego z pamięci.
+
+**Decyzja:** prompt v1 zostaje bez zmian. Pozostałe scenariusze sprawdzimy na żywo podczas prezentacji.
 
 ## Szablon kolejnej iteracji
 

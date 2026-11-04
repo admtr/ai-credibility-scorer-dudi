@@ -18,7 +18,7 @@ Etap 2 (agent i model) wraz z tool callingiem na **symulowanej bazie danych**: d
 
 ### Wybór modelu
 
-Na podstawie wstępnych testów domyślnym modelem będzie **`deepseek-v3`**. W scenariuszach z [eval/cases.md](eval/cases.md) (T01–T03, P01, P08) odpowiadał zwięźle i poprawną polszczyzną, wywoływał właściwe narzędzie, nie halucynował i trzymał się formatu raportu. Testowany wcześniej `qwen3:4b` w tym samym scenariuszu T01 przechodził na angielski i dodawał zmyślone treści.
+Domyślnym modelem jest **`DeepSeek-V3.1`** udostępniany przez PCSS (`https://llm.hpc.psnc.pl/v1`, API zgodne z OpenAI). W scenariuszach z [eval/cases.md](eval/cases.md) (T01–T03, P01, P08) odpowiadał zwięźle i poprawną polszczyzną, wywoływał właściwe narzędzie, nie halucynował i trzymał się formatu raportu. Testowany wcześniej `qwen3:4b` w tym samym scenariuszu T01 przechodził na angielski i dodawał zmyślone treści. Uzasadnienie: [documents/model-selection.md](documents/model-selection.md).
 
 `qwen3:4b` w Ollamie zostaje jako opcja do pracy lokalnej bez dostępu do API.
 
@@ -27,9 +27,23 @@ Na podstawie wstępnych testów domyślnym modelem będzie **`deepseek-v3`**. W 
 ### Wymagania
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-- [Ollama](https://ollama.com/download)
+- klucz API do modeli PCSS (`llm.hpc.psnc.pl`)
+- opcjonalnie [Ollama](https://ollama.com/download), jeśli chcesz uruchomić model lokalnie
 
-### Krok po kroku
+### Krok po kroku (domyślnie: DeepSeek-V3.1 przez PCSS)
+
+```bash
+# 1. Ustaw klucz API w zmiennej środowiskowej (klucz nie trafia do repozytorium)
+export LLM_API_KEY=<twój klucz>          # bash
+$env:LLM_API_KEY = "<twój klucz>"        # PowerShell
+
+# 2. Uruchom agenta (z katalogu głównego repozytorium)
+dotnet run --project src/DuDi.Cli
+```
+
+Bez ustawionego `LLM_API_KEY` aplikacja wyświetli komunikat i zakończy działanie.
+
+### Wariant lokalny (qwen3:4b w Ollamie)
 
 ```bash
 # 1. Pobierz model (ok. 2,5 GB)
@@ -38,8 +52,8 @@ ollama pull qwen3:4b
 # 2. Upewnij się, że Ollama działa (zwykle startuje sama; jeśli nie:)
 ollama serve
 
-# 3. Uruchom agenta (z katalogu głównego repozytorium)
-dotnet run --project src/DuDi.Cli
+# 3. Uruchom agenta z lokalnym modelem
+dotnet run --project src/DuDi.Cli -- --Agent:Provider=Ollama --Agent:Endpoint=http://localhost:11434 --Agent:Model=qwen3:4b
 ```
 
 Jeśli modelu nie ma lokalnie, aplikacja zaproponuje jego pobranie.
@@ -70,8 +84,8 @@ Testy nie wymagają Ollamy. Sprawdzają walidację NIP i rachunków, reguły ryz
 Ustawienia są w `src/DuDi.Cli/appsettings.json`. Każde można nadpisać argumentem po `--` albo zmienną środowiskową:
 
 ```bash
-# inny model
-dotnet run --project src/DuDi.Cli -- --Agent:Model=qwen3:8b
+# inny model u tego samego dostawcy
+dotnet run --project src/DuDi.Cli -- --Agent:Model=<nazwa modelu w PCSS>
 
 # tryb bez tool callingu: aplikacja sama dokleja dane kontrahenta do kontekstu
 dotnet run --project src/DuDi.Cli -- --Agent:ContextMode=Injected
@@ -79,16 +93,19 @@ dotnet run --project src/DuDi.Cli -- --Agent:ContextMode=Injected
 # symulowana awaria rejestru (WhiteList, Krs, Crbr, Sanctions, Relations)
 dotnet run --project src/DuDi.Cli -- --Data:Mock:UnavailableSources:0=Crbr
 
-# model przez API zgodne z OpenAI (np. PCSS); klucz w zmiennej LLM_API_KEY
-dotnet run --project src/DuDi.Cli -- --Agent:Provider=OpenAICompatible --Agent:Endpoint=https://llm.hpc.psnc.pl/v1 --Agent:Model=<nazwa>
+# model lokalny w Ollamie
+dotnet run --project src/DuDi.Cli -- --Agent:Provider=Ollama --Agent:Endpoint=http://localhost:11434 --Agent:Model=qwen3:4b
 ```
 
 | Ustawienie | Domyślnie | Opis |
 |---|---|---|
-| `Agent:Model` | `qwen3:4b` | Model w Ollamie lub u dostawcy API. |
+| `Agent:Provider` | `OpenAICompatible` | `OpenAICompatible` (PCSS i inne API zgodne z OpenAI) albo `Ollama`. |
+| `Agent:Endpoint` | `https://llm.hpc.psnc.pl/v1` | Adres API. Dla Ollamy: `http://localhost:11434`. |
+| `Agent:Model` | `DeepSeek-V3.1` | Model u dostawcy API lub w Ollamie. |
+| `Agent:ApiKeyEnvironmentVariable` | `LLM_API_KEY` | Nazwa zmiennej środowiskowej z kluczem API. |
 | `Agent:Temperature` | `0.2` | Niska, żeby odpowiedzi były powtarzalne. |
-| `Agent:ContextWindow` | `16384` | `num_ctx` w Ollamie. |
-| `Agent:Thinking` | `false` | Tryb „thinking” Qwen3. |
+| `Agent:ContextWindow` | `16384` | `num_ctx`, używane tylko w Ollamie. |
+| `Agent:Thinking` | `false` | Tryb „thinking” Qwen3, używany tylko w Ollamie. |
 | `Agent:ContextMode` | `Tools` | `Tools`: model wywołuje narzędzia. `Injected`: aplikacja dokleja dane. |
 | `Data:Source` | `Mock` | Na tym etapie tylko symulowana baza. |
 
