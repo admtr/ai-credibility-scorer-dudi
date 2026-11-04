@@ -51,8 +51,10 @@ public readonly record struct BankAccountNumber
     /// <summary>Zapis „61 1090 1014 0000 0712 1981 2874”.</summary>
     public string ToDisplayString()
     {
-        var groups = Enumerable.Range(0, 6).Select(i => Value.Substring(2 + i * 4, 4));
-        return $"{Value[..2]} {string.Join(' ', groups)}";
+        // Lambda w strukturze nie może sięgać do this (CS1673), więc kopiujemy wartość do zmiennej lokalnej.
+        var value = Value;
+        var groups = Enumerable.Range(0, 6).Select(i => value.Substring(2 + i * 4, 4));
+        return $"{value[..2]} {string.Join(' ', groups)}";
     }
 
     public override string ToString() => Value ?? string.Empty;
