@@ -14,7 +14,13 @@ Agent samodzielnie dobiera kolejne kroki analizy w zależności od tego, co znaj
 
 ## Stan projektu
 
-Etap 2 (agent i model) wraz z tool callingiem na **symulowanej bazie danych**: działający czat w konsoli, model `qwen3:4b` w Ollamie, trzy narzędzia rejestrów, ocena ryzyka liczona regułami. Dane to fikcyjne firmy zapisane w formacie prawdziwych API (Biała lista VAT, KRS). Połączenie z prawdziwymi rejestrami pojawi się w etapach 3–4.
+Etap 2 (agent i model) wraz z tool callingiem na **symulowanej bazie danych**: działający czat w konsoli, trzy narzędzia rejestrów, ocena ryzyka liczona regułami. Dane to fikcyjne firmy zapisane w formacie prawdziwych API (Biała lista VAT, KRS). Połączenie z prawdziwymi rejestrami pojawi się w etapach 3–4.
+
+### Wybór modelu
+
+Na podstawie wstępnych testów domyślnym modelem będzie **`deepseek-v3`**. W scenariuszach z [eval/cases.md](eval/cases.md) (T01–T03, P01, P08) odpowiadał zwięźle i poprawną polszczyzną, wywoływał właściwe narzędzie, nie halucynował i trzymał się formatu raportu. Testowany wcześniej `qwen3:4b` w tym samym scenariuszu T01 przechodził na angielski i dodawał zmyślone treści.
+
+`qwen3:4b` w Ollamie zostaje jako opcja do pracy lokalnej bez dostępu do API.
 
 ## Jak uruchomić
 
