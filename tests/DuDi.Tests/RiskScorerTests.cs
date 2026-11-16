@@ -106,6 +106,22 @@ public class RiskScorerTests
         Assert.Equal(RiskLevel.Critical, report.Verdict);
     }
 
+    [Fact]
+    public void Scorer_runs_only_configured_rules()
+    {
+        // Profil ma zarówno likwidację (KRS), jak i zwolnienie z VAT, ale uruchamiamy wyłącznie regułę VAT.
+        var profile = Profile(
+            vat: Vat(VatStatus.Exempt),
+            krs: Krs(registeredOn: new DateOnly(2010, 1, 1), statements: [2024, 2025], inLiquidation: true));
+
+        var vatOnlyScorer = new RiskScorer([new DuDi.Core.Risk.Rules.VatStatusRiskRule()]);
+        var report = vatOnlyScorer.Evaluate(profile);
+
+        Assert.Equal(RiskLevel.Low, report.Verdict);
+        var finding = Assert.Single(report.Findings);
+        Assert.Equal(FindingCodes.VatExempt, finding.Code);
+    }
+
     private static readonly Nip TestNip = Nip.Parse("9488127353");
 
     private static CompanyProfile Profile(VatSubject? vat = null, KrsEntry? krs = null)
