@@ -196,4 +196,27 @@ public class ScenarioTests
         Assert.Equal(8, companies.Count);
         Assert.DoesNotContain(companies, c => c.Nip == MockNips.Unknown);
     }
+
+    [Fact]
+    public async Task Verifier_can_compose_independent_source_ports()
+    {
+        var healthy = TestEnvironment.CreateMockSource();
+        var brokenCrbr = TestEnvironment.CreateMockSource(MockRegistrySource.CrbrKey);
+
+        var hybridVerifier = new CounterpartyVerifier(
+            vatSource: healthy,
+            krsSource: healthy,
+            crbrSource: brokenCrbr,
+            sanctionsSource: healthy,
+            relationsSource: healthy,
+            FixedTimeProvider.Checkpoint);
+
+        var report = await hybridVerifier.VerifyAsync(MockNips.Alfa);
+
+        Assert.True(report.CompanyFound);
+        Assert.True(report.IsIncomplete);
+        Assert.Equal(CheckStatus.Ok, report.Profile.Vat.Status);
+        Assert.Equal(CheckStatus.Ok, report.Profile.Krs.Status);
+        Assert.Equal(CheckStatus.Unavailable, report.Profile.BeneficialOwners.Status);
+    }
 }

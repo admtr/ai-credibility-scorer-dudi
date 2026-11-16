@@ -1,11 +1,11 @@
 using DuDi.Agent;
 using DuDi.Agent.Tools;
-using DuDi.Sources.Mock;
+using DuDi.Core.Registry;
 
 namespace DuDi.Cli;
 
 /// <summary>Pętla czatu w konsoli: komendy, strumieniowanie odpowiedzi, przerwanie odpowiedzi przez Ctrl+C.</summary>
-public sealed class ChatLoop(DuDiAgent agent, RegistryTools tools, MockRegistrySource? mockSource)
+public sealed class ChatLoop(DuDiAgent agent, RegistryTools tools, IDemoCompanyCatalog? demoCatalog)
 {
     private CancellationTokenSource? currentTurn;
 
@@ -71,7 +71,7 @@ public sealed class ChatLoop(DuDiAgent agent, RegistryTools tools, MockRegistryS
 
             Console.WriteLine();
 
-            if (mockSource is not null)
+            if (demoCatalog is not null)
                 ConsoleUi.Dim(ContextBuilder.TestDataMarker);
         }
         catch (OperationCanceledException) when (turn.IsCancellationRequested)
@@ -154,7 +154,7 @@ public sealed class ChatLoop(DuDiAgent agent, RegistryTools tools, MockRegistryS
 
     private void PrintCompanies()
     {
-        if (mockSource is null)
+        if (demoCatalog is null)
         {
             ConsoleUi.Dim("Lista firm jest dostępna tylko w trybie Mock.");
             return;
@@ -162,7 +162,7 @@ public sealed class ChatLoop(DuDiAgent agent, RegistryTools tools, MockRegistryS
 
         ConsoleUi.Dim($"Firmy w symulowanej bazie {ContextBuilder.TestDataMarker}:");
 
-        foreach (var (nip, name) in mockSource.Companies)
+        foreach (var (nip, name) in demoCatalog.Companies)
             ConsoleUi.Dim($"  {nip.ToDisplayString()}  {name}");
 
         ConsoleUi.Dim("  103-286-05-45  (NIP spoza bazy – do sprawdzenia reakcji na brak danych)");

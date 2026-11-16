@@ -19,7 +19,7 @@ namespace DuDi.Sources.Mock;
 /// <c>sanctions/eu-sanctions.csv</c> – lista sankcyjna w formacie CSV UE.
 /// Wszystkie firmy i osoby są fikcyjne.
 /// </remarks>
-public sealed class MockRegistrySource : IRegistrySource
+public sealed class MockRegistrySource : IRegistrySource, IDemoCompanyCatalog
 {
     public const string WhiteListKey = "WhiteList";
     public const string KrsKey = "Krs";
