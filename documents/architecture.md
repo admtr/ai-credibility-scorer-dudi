@@ -5,28 +5,31 @@
 ```text
 ┌────────────┐  pytanie / NIP   ┌──────────────────────────────────────────────┐
 │ Użytkownik │ ───────────────▶ │ DuDi.Cli – pętla czatu, komendy, streaming   │
-└────────────┘ ◀─────────────── └──────────────────────┬───────────────────────┘
-               odpowiedź                               │
+└────────────┘ ◀─────────────── │  ServiceCollectionExtensions (DI)            │
+               odpowiedź        └──────────────────────┬───────────────────────┘
+                                                       │
                                 ┌──────────────────────▼───────────────────────┐
                                 │ DuDi.Agent                                   │
                                 │  DuDiAgent: prompt systemowy + historia      │
                                 │  IChatClient + UseFunctionInvocation         │
-                                │  RegistryTools ── narzędzia dla modelu       │
-                                │  ContextBuilder ── RiskReport → tekst        │
+                                │  RegistryTools ── cienkie adaptery narzędzi  │
+                                │  ContextBuilder ── fakty/raport → tekst LLM  │
                                 └──────────────────────┬───────────────────────┘
-                                                       │ (wywołanie narzędzia)
+                                                       │ (ICounterpartyVerifier)
                                 ┌──────────────────────▼───────────────────────┐
                                 │ DuDi.Core                                    │
                                 │  CounterpartyVerifier: NIP → WL → KRS → ...  │
-                                │  RiskScorer: reguły → werdykt + ustalenia    │
-                                │  Nip, BankAccountNumber, IRegistrySource     │
+                                │  RiskScorer + 7 reguł IRiskRule (Rules/*)    │
+                                │  Wąskie porty: IVatWhiteListSource,          │
+                                │   IKrsSource, ICrbrSource, ISanctionsSource, │
+                                │   IPersonRelationsSource, IDemoCompanyCatalog│
                                 └──────────────────────┬───────────────────────┘
                                                        │
                                 ┌──────────────────────▼───────────────────────┐
                                 │ DuDi.Sources                                 │
                                 │  MockRegistrySource ← teraz (data/fixtures)  │
                                 │  mappery WL / KRS / CRBR / sankcje UE        │
-                                │  klienci HTTP ← etap 3–4                     │
+                                │  klienci HTTP ← etap 3–4 (per port)          │
                                 └──────────────────────────────────────────────┘
 ```
 
@@ -42,10 +45,12 @@ Przykładowa tura w trybie `Tools`:
 
 | Decyzja | Dlaczego |
 |---|---|
-| **Werdykt liczą reguły w C#, a LLM tylko go tłumaczy** | Wynik jest powtarzalny i testowalny (testy jednostkowe dla każdej reguły i scenariusza). Model nie „wymyśla” poziomu ryzyka, a na obronie łatwo pokazać, skąd wziął się werdykt. Gotowe zalecenia (`Finding.Advice`) ograniczają halucynacje małego modelu. |
+| **Werdykt liczą reguły w C# (`IRiskRule`), a LLM tylko go tłumaczy** | Wynik jest powtarzalny i testowalny (testy jednostkowe dla każdej reguły i scenariusza). Każda z 7 reguł (`src/DuDi.Core/Risk/Rules/`) jest osobną klasą implementującą `IRiskRule`, a `RiskScorer` (`IRiskScorer`) agreguje ich wyniki. Model nie „wymyśla” poziomu ryzyka, a gotowe zalecenia (`Finding.Advice`) ograniczają halucynacje małego modelu. |
+| **Wąskie porty rejestrów (Ports & Adapters / ISP)** | Każdy rejestr ma własny interfejs w `DuDi.Core.Registry` (`IVatWhiteListSource`, `IKrsSource`, `ICrbrSource`, `ISanctionsSource`, `IPersonRelationsSource`). Pozwala to w etapie 3 podmieniać źródła niezależnie od siebie (np. HTTP dla Białej listy i KRS, lokalny CSV dla sankcji UE oraz Mock dla CRBR). |
+| **Jednolita warstwa Use-Case'ów (`ICounterpartyVerifier`)** | Wszystkie 3 operacje (`VerifyAsync`, `CheckAccountAsync`, `FindPersonLinksAsync`) przechodzą przez `CounterpartyVerifier`, a całe formatowanie tekstu dla LLM skupia `ContextBuilder`. Dzięki temu `RegistryTools` (oraz przyszły serwer MCP w etapie 4) są cienkimi adapterami, które tylko walidują wejście. |
 | **Tool calling: 3 wąskie narzędzia** (`sprawdz_kontrahenta`, `sprawdz_rachunek`, `znajdz_powiazania_osoby`) | Model decyduje, *co* sprawdzić (np. sam sprawdza firmę powiązaną), ale nie *jak*: parametry to NIP, rachunek albo imię i nazwisko, nigdy URL. Mała liczba narzędzi jest łatwiejsza dla modelu 4B. Szczegółowe zapytania (WL, KRS, CRBR…) siedzą za jednym narzędziem, bo i tak zawsze idą razem. |
 | **Dwa tryby kontekstu** (`Agent:ContextMode`) | `Tools` (domyślny): model sam wywołuje narzędzia. `Injected`: aplikacja rozpoznaje NIP regexem i dokleja dane. Drugi tryb służy do porównania „aplikacja decyduje” z „model decyduje” oraz jako fallback dla modeli bez tool callingu. |
-| **Mock w formacie prawdziwych API** | Przejście na internet to nowa implementacja `IRegistrySource`, bez zmian w agencie i regułach. Testy `SampleParsingTests` dowodzą, że te same mappery czytają prawdziwe odpowiedzi. |
+| **Mock w formacie prawdziwych API** | Przejście na internet to dopisanie implementacji odpowiednich portów (`IVatWhiteListSource`, `IKrsSource`), bez zmian w agencie i regułach. Testy `SampleParsingTests` dowodzą, że te same mappery czytają prawdziwe odpowiedzi. |
 | **Błąd źródła ≠ „OK”** | Każdy wyjątek źródła daje status `Unavailable`, czyli punkt „NIE SPRAWDZONO” w raporcie i ostrzeżenie o niepełnych danych. Awarię można zasymulować przez `Data:Mock:UnavailableSources`. |
 | **Pochodzenie każdego faktu** | Każde ustalenie i każdy punkt „Co sprawdziliśmy” ma źródło i datę. Prompt każe je cytować. |
 | **`Microsoft.Extensions.AI` (`IChatClient`)** | Jedna abstrakcja dla Ollamy i API zgodnych z OpenAI (PCSS). Model i dostawcę zmienia się w `appsettings.json`. `UseFunctionInvocation` obsługuje pętlę tool callingu. Ten sam stos co w przykładach z zajęć (`sulmar/shelly`). |
@@ -72,7 +77,7 @@ Przykładowa tura w trybie `Tools`:
 
 ## Co dalej
 
-- **Etap 3:** klienci HTTP (`WhiteListClient`, `KrsClient`) za `IRegistrySource`, z `IHttpClientFactory`, resilience i cache. Obsługa błędów API (400/404/429).
-- **Etap 4:** te same narzędzia jako serwer MCP „rejestry-pl” (C# SDK MCP). Agent jako klient MCP.
+- **Etap 3:** klienci HTTP (`WhiteListClient : IVatWhiteListSource`, `KrsClient : IKrsSource`), z `IHttpClientFactory`, resilience i cache, rejestrowani w `AddDuDiSources`. Obsługa błędów API (400/404/429).
+- **Etap 4:** te same narzędzia jako serwer MCP „rejestry-pl” (C# SDK MCP) wywołujący `ICounterpartyVerifier` i `ContextBuilder`. Agent jako klient MCP.
 - **Etap 5:** RAG z przepisów (Biała lista – art. 96b VAT, art. 117ba Ordynacji, art. 15d CIT, CRBR, sankcje). Agent cytuje przepis przy zaleceniu.
 - **Etap 7:** automatyczne uruchamianie `eval/cases.md`: werdykt (deterministycznie), wywołania narzędzi, brak halucynacji.
