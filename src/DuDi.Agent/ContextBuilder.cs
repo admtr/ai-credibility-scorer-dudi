@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using DuDi.Core;
 using DuDi.Core.Registry;
 using DuDi.Core.Risk;
 using DuDi.Core.Verification;
@@ -7,7 +8,8 @@ using DuDi.Core.Verification;
 namespace DuDi.Agent;
 
 /// <summary>
-/// Zamienia <see cref="RiskReport"/> na zwięzły, stały w strukturze blok tekstu dla modelu.
+/// Zamienia wyniki weryfikacji (<see cref="RiskReport"/>, sprawdzenie rachunku, powiązania osobowe)
+/// na zwięzłe, stałe w strukturze bloki tekstu dla modelu.
 /// Do modelu trafiają wyłącznie fakty z pochodzeniem (źródło + data), wyliczony werdykt i gotowe zalecenia – nie surowy JSON.
 /// </summary>
 /// <param name="isTestData">Tryb Mock: blok jest oznaczony jako dane testowe.</param>
@@ -16,6 +18,45 @@ public sealed class ContextBuilder(bool isTestData)
     public const string TestDataMarker = "[DANE TESTOWE]";
 
     public bool IsTestData => isTestData;
+
+    public string BuildAccountCheck(Nip nip, SourceCheck<AccountCheck> check)
+    {
+        if (check.Status == CheckStatus.Unavailable)
+        {
+            return $"{Prefix()}NIE SPRAWDZONO: Biała lista VAT nie odpowiedziała ({check.Note}). Nie wiadomo, czy rachunek jest na liście – nie traktuj tego jako potwierdzenia.";
+        }
+
+        var result = check.Value!;
+        var stamp = $"({check.Source}, {Format(check.CheckedOn)})";
+
+        return result.Assigned
+            ? $"{Prefix()}Rachunek {result.Account.ToDisplayString()} JEST przypisany do NIP {nip.ToDisplayString()} na Białej liście VAT {stamp}."
+            : $"{Prefix()}Rachunek {result.Account.ToDisplayString()} NIE JEST przypisany do NIP {nip.ToDisplayString()} na Białej liście VAT {stamp}. " +
+              "Zalecenie: poproś kontrahenta o rachunek widoczny na Białej liście; przy płatności powyżej 15 000 zł na rachunek spoza listy " +
+              "grozi utrata prawa do zaliczenia wydatku w koszty i solidarna odpowiedzialność za VAT kontrahenta.";
+    }
+
+    public string BuildPersonLinks(string fullName, SourceCheck<IReadOnlyList<CompanyLink>> check)
+    {
+        if (check.Status == CheckStatus.Unavailable)
+            return $"{Prefix()}NIE SPRAWDZONO: wyszukiwanie powiązań nie powiodło się ({check.Note}).";
+
+        var links = check.Value ?? [];
+
+        if (links.Count == 0)
+        {
+            return $"{Prefix()}Nie znaleziono firm, w których zarządzie zasiada osoba „{fullName}” ({check.Source}). " +
+                   "Wyszukiwanie porównuje imię i nazwisko dokładnie (bez odmiany), więc brak wyniku nie wyklucza powiązań.";
+        }
+
+        var sb = new StringBuilder($"{Prefix()}Firmy, w których zarządzie zasiada osoba „{fullName}” ({check.Source}):\n");
+
+        foreach (var link in links)
+            sb.AppendLine($"- {link.CompanyName}, NIP {link.Nip.ToDisplayString()} – {link.Role.ToLowerInvariant()}");
+
+        sb.Append("Aby ocenić ryzyko którejś z tych firm, wywołaj sprawdz_kontrahenta z jej NIP-em.");
+        return sb.ToString();
+    }
 
     public string Build(RiskReport report)
     {
@@ -136,6 +177,8 @@ public sealed class ContextBuilder(bool isTestData)
         CheckOutcome.NotChecked => "NIE SPRAWDZONO",
         _ => outcome.ToString()
     };
+
+    private string Prefix() => isTestData ? $"{TestDataMarker} " : "";
 
     private static string Format(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 }

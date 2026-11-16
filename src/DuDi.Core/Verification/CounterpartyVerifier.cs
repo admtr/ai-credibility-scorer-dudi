@@ -7,23 +7,62 @@ namespace DuDi.Core.Verification;
 /// Zbiera fakty o kontrahencie ze wszystkich rejestrów i liczy ocenę ryzyka.
 /// Łańcuch: NIP → Biała lista VAT → numer KRS → odpis KRS → CRBR, listy sankcyjne, powiązania osobowe.
 /// </summary>
-public sealed class CounterpartyVerifier(IRegistrySource source, TimeProvider timeProvider)
+public sealed class CounterpartyVerifier(
+    IVatWhiteListSource vatSource,
+    IKrsSource krsSource,
+    ICrbrSource crbrSource,
+    ISanctionsSource sanctionsSource,
+    IPersonRelationsSource relationsSource,
+    IRiskScorer riskScorer,
+    TimeProvider timeProvider) : ICounterpartyVerifier
 {
+    public CounterpartyVerifier(
+        IVatWhiteListSource vatSource,
+        IKrsSource krsSource,
+        ICrbrSource crbrSource,
+        ISanctionsSource sanctionsSource,
+        IPersonRelationsSource relationsSource,
+        TimeProvider timeProvider)
+        : this(vatSource, krsSource, crbrSource, sanctionsSource, relationsSource, RiskScorer.Default, timeProvider)
+    {
+    }
+
+    public CounterpartyVerifier(IRegistrySource source, TimeProvider timeProvider)
+        : this(source, source, source, source, source, RiskScorer.Default, timeProvider)
+    {
+    }
+
     public Task<RiskReport> VerifyAsync(Nip nip, BankAccountNumber? invoiceAccount = null, CancellationToken cancellationToken = default) =>
         VerifyAsync(nip, invoiceAccount, checkRelations: true, cancellationToken);
+
+    public Task<SourceCheck<AccountCheck>> CheckAccountAsync(Nip nip, BankAccountNumber account, CancellationToken cancellationToken = default)
+    {
+        var today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
+        return CheckAsync<AccountCheck>(SourceNames.WhiteList, today,
+            async () => new AccountCheck(account, await vatSource.IsAccountAssignedAsync(nip, account, today, cancellationToken)),
+            cancellationToken);
+    }
+
+    public Task<SourceCheck<IReadOnlyList<CompanyLink>>> FindPersonLinksAsync(string fullName, CancellationToken cancellationToken = default)
+    {
+        var today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
+        return CheckAsync<IReadOnlyList<CompanyLink>>(SourceNames.Relations, today,
+            async () => await relationsSource.FindCompaniesByPersonAsync(fullName, cancellationToken),
+            cancellationToken);
+    }
 
     private async Task<RiskReport> VerifyAsync(Nip nip, BankAccountNumber? invoiceAccount, bool checkRelations, CancellationToken ct)
     {
         var today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
 
-        var vat = await CheckAsync(SourceNames.WhiteList, today, () => source.GetVatSubjectAsync(nip, today, ct), ct);
+        var vat = await CheckAsync(SourceNames.WhiteList, today, () => vatSource.GetVatSubjectAsync(nip, today, ct), ct);
 
         SourceCheck<AccountCheck>? account = null;
 
         if (invoiceAccount is { } invoice)
         {
             account = await CheckAsync<AccountCheck>(SourceNames.WhiteList, today,
-                async () => new AccountCheck(invoice, await source.IsAccountAssignedAsync(nip, invoice, today, ct)), ct);
+                async () => new AccountCheck(invoice, await vatSource.IsAccountAssignedAsync(nip, invoice, today, ct)), ct);
         }
 
         var krs = await CheckKrsAsync(vat, today, ct);
@@ -38,12 +77,12 @@ public sealed class CounterpartyVerifier(IRegistrySource source, TimeProvider ti
                 NotApplicable<SanctionsCheck>(SourceNames.Sanctions, today, notApplicable),
                 NotApplicable<RelationsCheck>(SourceNames.Relations, today, notApplicable));
 
-            return RiskScorer.Score(unknown);
+            return riskScorer.Score(unknown);
         }
 
         var beneficialOwners = krs.Status == CheckStatus.NotApplicable
             ? NotApplicable<BeneficialOwnersInfo>(SourceNames.Crbr, today, "CRBR dotyczy spółek wpisanych do KRS")
-            : await CheckAsync(SourceNames.Crbr, today, () => source.GetBeneficialOwnersAsync(nip, ct), ct);
+            : await CheckAsync(SourceNames.Crbr, today, () => crbrSource.GetBeneficialOwnersAsync(nip, ct), ct);
 
         var sanctions = await CheckSanctionsAsync(name, krs.Value, beneficialOwners.Value, today, ct);
 
@@ -52,7 +91,7 @@ public sealed class CounterpartyVerifier(IRegistrySource source, TimeProvider ti
             : NotApplicable<RelationsCheck>(SourceNames.Relations, today, null);
 
         var profile = new CompanyProfile(nip, name, today, vat, account, krs, beneficialOwners, sanctions, relations);
-        return RiskScorer.Score(profile);
+        return riskScorer.Score(profile);
     }
 
     private async Task<SourceCheck<KrsEntry>> CheckKrsAsync(SourceCheck<VatSubject> vat, DateOnly today, CancellationToken ct)
@@ -66,7 +105,7 @@ public sealed class CounterpartyVerifier(IRegistrySource source, TimeProvider ti
         if (vat.Value?.KrsNumber is not { Length: > 0 } krsNumber)
             return NotApplicable<KrsEntry>(SourceNames.Krs, today, "podmiot nie ma numeru KRS na Białej liście (np. jednoosobowa działalność) – KRS nie dotyczy");
 
-        return await CheckAsync(SourceNames.Krs, today, () => source.GetKrsEntryAsync(krsNumber, ct), ct);
+        return await CheckAsync(SourceNames.Krs, today, () => krsSource.GetKrsEntryAsync(krsNumber, ct), ct);
     }
 
     private async Task<SourceCheck<SanctionsCheck>> CheckSanctionsAsync(
@@ -94,7 +133,7 @@ public sealed class CounterpartyVerifier(IRegistrySource source, TimeProvider ti
             var hits = new List<SanctionHit>();
 
             foreach (var name in names)
-                hits.AddRange(await source.CheckSanctionsAsync(name, ct));
+                hits.AddRange(await sanctionsSource.CheckSanctionsAsync(name, ct));
 
             return new SanctionsCheck(names, hits);
         }, ct);
@@ -121,7 +160,7 @@ public sealed class CounterpartyVerifier(IRegistrySource source, TimeProvider ti
 
             foreach (var person in people)
             {
-                foreach (var link in await source.FindCompaniesByPersonAsync(person.FullName, ct))
+                foreach (var link in await relationsSource.FindCompaniesByPersonAsync(person.FullName, ct))
                 {
                     if (!seen.Add(link.Nip))
                         continue;

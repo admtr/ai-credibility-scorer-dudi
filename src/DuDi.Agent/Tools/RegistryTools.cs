@@ -1,8 +1,5 @@
 using System.ComponentModel;
-using System.Globalization;
-using System.Text;
 using DuDi.Core;
-using DuDi.Core.Registry;
 using DuDi.Core.Verification;
 using Microsoft.Extensions.AI;
 
@@ -12,18 +9,17 @@ namespace DuDi.Agent.Tools;
 public sealed record ToolInvocation(string Name, string Arguments);
 
 /// <summary>
-/// Narzędzia udostępniane modelowi. Model wybiera narzędzie i podaje argumenty, a aplikacja je waliduje i wykonuje.
-/// Parametry są wąskie (NIP, rachunek, imię i nazwisko) – model nigdy nie buduje URL-i ani zapytań do rejestrów.
+/// Cienki adapter narzędzi udostępnianych modelowi AI.
+/// Waliduje parametry wejściowe (NIP, rachunek, imię i nazwisko), wywołuje <see cref="ICounterpartyVerifier"/>
+/// i formatuje wynik przez <see cref="ContextBuilder"/>.
 /// </summary>
 /// <remarks>
 /// Narzędzia nie rzucają wyjątków do modelu: błędne dane wejściowe i awarie źródeł wracają jako czytelny tekst,
 /// który model może przekazać użytkownikowi.
 /// </remarks>
 public sealed class RegistryTools(
-    CounterpartyVerifier verifier,
-    IRegistrySource source,
-    ContextBuilder contextBuilder,
-    TimeProvider timeProvider)
+    ICounterpartyVerifier verifier,
+    ContextBuilder contextBuilder)
 {
     public const string CheckCounterpartyName = "sprawdz_kontrahenta";
     public const string CheckAccountName = "sprawdz_rachunek";
@@ -100,24 +96,8 @@ public sealed class RegistryTools(
         if (!BankAccountNumber.TryParse(numerRachunku, out var account, out var accountError))
             return $"BŁĄD: {accountError}";
 
-        var today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-        var stamp = $"({SourceNames.WhiteList}, {today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)})";
-        bool assigned;
-
-        try
-        {
-            assigned = await source.IsAccountAssignedAsync(parsedNip, account, today, cancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return $"{Prefix()}NIE SPRAWDZONO: Biała lista VAT nie odpowiedziała ({ex.Message}). Nie wiadomo, czy rachunek jest na liście – nie traktuj tego jako potwierdzenia.";
-        }
-
-        return assigned
-            ? $"{Prefix()}Rachunek {account.ToDisplayString()} JEST przypisany do NIP {parsedNip.ToDisplayString()} na Białej liście VAT {stamp}."
-            : $"{Prefix()}Rachunek {account.ToDisplayString()} NIE JEST przypisany do NIP {parsedNip.ToDisplayString()} na Białej liście VAT {stamp}. " +
-              "Zalecenie: poproś kontrahenta o rachunek widoczny na Białej liście; przy płatności powyżej 15 000 zł na rachunek spoza listy " +
-              "grozi utrata prawa do zaliczenia wydatku w koszty i solidarna odpowiedzialność za VAT kontrahenta.";
+        var check = await verifier.CheckAccountAsync(parsedNip, account, cancellationToken);
+        return contextBuilder.BuildAccountCheck(parsedNip, check);
     }
 
     public async Task<string> FindPersonLinksAsync(
@@ -129,31 +109,7 @@ public sealed class RegistryTools(
         if (string.IsNullOrWhiteSpace(imieINazwisko) || imieINazwisko.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length < 2)
             return "BŁĄD: podaj imię i nazwisko osoby (co najmniej dwa słowa).";
 
-        IReadOnlyList<CompanyLink> links;
-
-        try
-        {
-            links = await source.FindCompaniesByPersonAsync(imieINazwisko, cancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return $"{Prefix()}NIE SPRAWDZONO: wyszukiwanie powiązań nie powiodło się ({ex.Message}).";
-        }
-
-        if (links.Count == 0)
-        {
-            return $"{Prefix()}Nie znaleziono firm, w których zarządzie zasiada osoba „{imieINazwisko}” ({SourceNames.Relations}). " +
-                   "Wyszukiwanie porównuje imię i nazwisko dokładnie (bez odmiany), więc brak wyniku nie wyklucza powiązań.";
-        }
-
-        var sb = new StringBuilder($"{Prefix()}Firmy, w których zarządzie zasiada osoba „{imieINazwisko}” ({SourceNames.Relations}):\n");
-
-        foreach (var link in links)
-            sb.AppendLine($"- {link.CompanyName}, NIP {link.Nip.ToDisplayString()} – {link.Role.ToLowerInvariant()}");
-
-        sb.Append("Aby ocenić ryzyko którejś z tych firm, wywołaj sprawdz_kontrahenta z jej NIP-em.");
-        return sb.ToString();
+        var check = await verifier.FindPersonLinksAsync(imieINazwisko, cancellationToken);
+        return contextBuilder.BuildPersonLinks(imieINazwisko, check);
     }
-
-    private string Prefix() => contextBuilder.IsTestData ? $"{ContextBuilder.TestDataMarker} " : "";
 }

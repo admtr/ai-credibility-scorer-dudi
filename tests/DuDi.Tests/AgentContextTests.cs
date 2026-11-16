@@ -67,7 +67,7 @@ public class RegistryToolsTests
     {
         var source = TestEnvironment.CreateMockSource(unavailableSources);
         var verifier = new Core.Verification.CounterpartyVerifier(source, FixedTimeProvider.Checkpoint);
-        return new RegistryTools(verifier, source, new ContextBuilder(isTestData: true), FixedTimeProvider.Checkpoint);
+        return new RegistryTools(verifier, new ContextBuilder(isTestData: true));
     }
 
     [Fact]

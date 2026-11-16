@@ -9,7 +9,7 @@ namespace DuDi.Agent;
 /// Rozpoznaje NIP w wiadomości, pobiera dane i dokleja blok &lt;dane_kontrahenta&gt; przed treścią użytkownika.
 /// Zostawiamy go do porównania z tool callingiem (etap 2 vs etap 3) i do ewaluacji.
 /// </summary>
-public sealed class ContextInjector(CounterpartyVerifier verifier, ContextBuilder contextBuilder)
+public sealed class ContextInjector(ICounterpartyVerifier verifier, ContextBuilder contextBuilder)
 {
     public async Task<string> EnrichAsync(string userMessage, CancellationToken cancellationToken = default)
     {
